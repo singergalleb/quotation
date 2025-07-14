@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma Invoice Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            font-size: 13px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #c00;
+            text-align: center;
+            border-bottom: 1px solid #c00;
+            padding-bottom: 5px;
+            font-size: 18px;
+            margin: 5px 0 10px 0;
+        }
+        .form-section {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .form-section h2 {
+            color: #c00;
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 180px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 2px;
+            font-weight: bold;
+            color: #333;
+            font-size: 12px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .radio-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .radio-group label {
+            margin-right: 15px;
+            font-weight: normal;
+        }
+        .btn {
+            background-color: #c00;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        .btn:hover {
+            background-color: #a00;
+        }
+        .item-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            align-items: center;
+        }
+        .item-row input {
+            margin-right: 5px;
+            padding: 4px;
+            font-size: 11px;
+        }
+        .add-item {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .remove-item {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 11px;
+        }
+        #items-container {
+            margin-bottom: 10px;
+        }
+        .vat-calculation {
+            background-color: #f9f9f9;
+            padding: 6px;
+            border-radius: 2px;
+            margin-top: 6px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+        .two-column {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .column {
+            width: 48%;
+        }
+        .vat-calculation h3 {
+            margin: 2px 0 5px 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proforma Invoice Generator</h1>
+        
+        <form id="invoice-form">
+            <div class="form-section">
+                <div class="two-column">
+                    <div class="column">
+                        <h2>Company Information</h2>
+                        <div class="form-group">
+                            <label for="company-name">Company Name</label>
+                            <input type="text" id="company-name" value="SINGER SRI LANKA PLC" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="branch">Branch</label>
+                            <input type="text" id="branch" value="GALLE-B" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="invoice-number">Invoice Number</label>
+                            <input type="text" id="invoice-number" placeholder="BIP-R129439">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Company Address</label>
+                            <textarea id="address" required>NO. 176, MAIN STREET, GALLE</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact">Contact Information</label>
+                            <textarea id="contact" required>091-2247148\nVAT NO: 124008026 7000</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <h2>Client Information</h2>
+                        <div class="form-group">
+                            <label for="client-id">Client ID</label>
+                            <input type="text" id="client-id" placeholder="BIP-R129439">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-name">Name</label>
+                            <input type="text" id="client-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-company">Company Name</label>
+                            <input type="text" id="client-company">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-address">Street Address</label>
+                            <input type="text" id="client-address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-city">City</label>
+                            <input type="text" id="client-city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-phone">Phone</label>
+                            <input type="text" id="client-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-vat">VAT NO</label>
+                            <input type="text" id="client-vat">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Invoice Options</h2>
+                <div class="radio-group">
+                    <label>Invoice Type:</label>
+                    <label><input type="radio" name="invoice-type" value="vat" checked> With VAT (18%)</label>
+                    <label><input type="radio" name="invoice-type" value="no-vat"> Without VAT</label>
+                </div>
+                <div class="form-group">
+                    <label for="warranty">Warranty Information</label>
+                    <input type="text" id="warranty" value="1 years (optional)">
+                </div>
+                <div class="form-group">
+                    <label for="delivery">Delivery Information</label>
+                    <input type="text" id="delivery" value="Ex-stock, subject to the availability at time of placing order.">
+                </div>
+                <div class="form-group">
+                    <label for="payment-terms">Payment Terms</label>
+                    <textarea id="payment-terms">Full Payment upon confirmation of order.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="note">Note</label>
+                    <textarea id="note">If you have any further details, Please contact us</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="signatory-name">Signatory Name</label>
+                        <input type="text" id="signatory-name" value="K.D.IMBULDENIYA">
+                    </div>
+                    <div class="form-group">
+                        <label for="signatory-title">Signatory Title</label>
+                        <input type="text" id="signatory-title" value="Senior Manager, Singer –Plus Galle-B">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Invoice Items</h2>
+                <div id="items-container">
+                    <div class="item-row">
+                        <input type="text" placeholder="Model" class="item-model" style="width: 15%;">
+                        <input 
+  type="text" 
+  list="model-options" 
+  placeholder="Description" 
+  class="item-description" 
+  style="width: 40%;"
+>
+<datalist id="model-options">
+  <option value=""></option>
+  <option value="Sanasuma Extended warranty for 3 years (2 Years Extended Warranty + Fire, Lightning, Electrical Inclusion, Explosion, Flood, Cyclone, Storm, Tempest & Natural Disasters Cover)">
+</datalist>
+                        <input type="number" placeholder="Qty" class="item-qty" style="width: 10%;">
+                        <input type="number" placeholder="Unit Price" class="item-price" style="width: 15%;">
+                        <input type="number" placeholder="Discount %" class="item-discount" style="width: 10%;">
+                        <button type="button" class="remove-item">×</button>
+                    </div>
+                </div>
+                <button type="button" id="add-item" class="add-item">+ Add Item</button>
+                
+                <div class="vat-calculation">
+                    <h3>Calculation Preview</h3>
+                    <div id="vat-preview">
+                        <p>Enter items to see calculation</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" id="generate-pdf" class="btn">Generate PDF</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        
+        // Add item row
+        document.getElementById('add-item').addEventListener('click', function() {
+            const container = document.getElementById('items-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Model" class="item-model" style="width: 15%;">
+
+                <input 
+  type="text" 
+  list="model-options" 
+  placeholder="Description" 
+  class="item-description" 
+  style="width: 40%;"
+>
+<datalist id="model-options">
+  <option value=""></option>
+  <option value="Sanasuma Extended warranty for 3 years (2 Years Extended Warranty + Fire, Lightning, Electrical Inclusion, Explosion, Flood, Cyclone, Storm, Tempest & Natural Disasters Cover)">
+</datalist>
+                <input type="number" placeholder="Qty" class="item-qty" style="width: 10%;">
+                <input type="number" placeholder="Unit Price" class="item-price" style="width: 15%;">
+                <input type="number" placeholder="Discount %" class="item-discount" style="width: 10%;">
+                <button type="button" class="remove-item">×</button>
+            `;
+            container.appendChild(newRow);
+            
+            newRow.querySelector('.remove-item').addEventListener('click', function() {
+                container.removeChild(newRow);
+                updateVatPreview();
+            });
+            
+            const inputs = newRow.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', updateVatPreview);
+            });
+        });
+        
+        // Update calculation preview
+        function updateVatPreview() {
+            const items = getItems();
+            const invoiceType = document.querySelector('input[name="invoice-type"]:checked').value;
+            const vatRate = 0.18;
+            
+            let subtotal = 0;
+            let totalDiscount = 0;
+            let vatAmount = 0;
+            let grandTotal = 0;
+            
+            items.forEach(item => {
+                const qty = parseFloat(item.qty) || 0;
+                const price = parseFloat(item.price) || 0;
+                const discountPercent = parseFloat(item.discount) || 0;
+                
+                // Calculate discounted price
+                const discountedPrice = price * (1 - discountPercent / 100);
+                
+                if (invoiceType === 'vat') {
+                    // With VAT calculations
+                    const priceWithoutVat = discountedPrice / (1 + vatRate);
+                    const itemVat = priceWithoutVat * vatRate;
+                    
+                    subtotal += priceWithoutVat * qty;
+                    totalDiscount += (price - discountedPrice) * qty;
+                    vatAmount += itemVat * qty;
+                    grandTotal = subtotal + vatAmount;
+                } else {
+                    // Without VAT calculations (simple discount)
+                    subtotal += price * qty;
+                    totalDiscount += (price - discountedPrice) * qty;
+                    grandTotal = subtotal - totalDiscount;
+                }
+            });
+            
+            // Update preview
+            const vatPreview = document.getElementById('vat-preview');
+            
+            if (invoiceType === 'vat') {
+                vatPreview.innerHTML = `
+                    <p><strong>Subtotal (without VAT):</strong> ${subtotal.toFixed(2)}</p>
+                    <p><strong>Total Discount:</strong> ${totalDiscount.toFixed(2)}</p>
+                    <p><strong>VAT Amount (18%):</strong> ${vatAmount.toFixed(2)}</p>
+                    <p><strong>Grand Total:</strong> ${grandTotal.toFixed(2)}</p>
+                `;
+            } else {
+                vatPreview.innerHTML = `
+                    <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)}</p>
+                    <p><strong>Total Discount:</strong> ${totalDiscount.toFixed(2)}</p>
+                    <p><strong>Grand Total:</strong> ${grandTotal.toFixed(2)}</p>
+                `;
+            }
+        }
+        
+        function getItems() {
+            const items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                items.push({
+                    model: row.querySelector('.item-model').value,
+                    description: row.querySelector('.item-description').value,
+                    qty: row.querySelector('.item-qty').value,
+                    price: row.querySelector('.item-price').value,
+                    discount: row.querySelector('.item-discount').value || 0
+                });
+            });
+            return items;
+        }
+        
+        document.querySelectorAll('input[name="invoice-type"]').forEach(radio => {
+            radio.addEventListener('change', updateVatPreview);
+        });
+        
+        document.getElementById('generate-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4', lineHeight: 1.2 });
+            
+            // Get form values
+            const companyName = document.getElementById('company-name').value;
+            const branch = document.getElementById('branch').value;
+            const date = document.getElementById('date').value;
+            const invoiceNumber = document.getElementById('invoice-number').value;
+            const address = document.getElementById('address').value;
+            const contact = document.getElementById('contact').value;
+            
+            const clientId = document.getElementById('client-id').value;
+            const clientName = document.getElementById('client-name').value;
+            const clientCompany = document.getElementById('client-company').value;
+            const clientAddress = document.getElementById('client-address').value;
+            const clientCity = document.getElementById('client-city').value;
+            const clientPhone = document.getElementById('client-phone').value;
+            const clientVat = document.getElementById('client-vat').value;
+            
+            const invoiceType = document.querySelector('input[name="invoice-type"]:checked').value;
+            const warranty = document.getElementById('warranty').value;
+            const delivery = document.getElementById('delivery').value;
+            const paymentTerms = document.getElementById('payment-terms').value;
+            const note = document.getElementById('note').value;
+            const signatoryName = document.getElementById('signatory-name').value;
+            const signatoryTitle = document.getElementById('signatory-title').value;
+            
+            // Get items and calculate values
+            const items = getItems();
+            const vatRate = 0.18;
+            
+            let subtotal = 0;
+            let totalDiscount = 0;
+            let vatAmount = 0;
+            let grandTotal = 0;
+            
+            // Calculate item values
+            const processedItems = items.map(item => {
+                const qty = parseFloat(item.qty) || 0;
+                const price = parseFloat(item.price) || 0;
+                const discountPercent = parseFloat(item.discount) || 0;
+                const discountedPrice = price * (1 - discountPercent / 100);
+                
+                if (invoiceType === 'vat') {
+                    // With VAT calculations
+                    const priceWithoutVat = discountedPrice / (1 + vatRate);
+                    const itemVat = priceWithoutVat * vatRate;
+                    const itemTotalWithoutVat = priceWithoutVat * qty;
+                    const itemTotalWithVat = itemTotalWithoutVat + (itemVat * qty);
+                    
+                    subtotal += itemTotalWithoutVat;
+                    totalDiscount += (price - discountedPrice) * qty;
+                    vatAmount += itemVat * qty;
+                    grandTotal = subtotal + vatAmount;
+                    
+                    return {
+                        ...item,
+                        priceWithoutVat: priceWithoutVat.toFixed(2),
+                        discountedPrice: discountedPrice.toFixed(2),
+                        vatAmount: (itemVat * qty).toFixed(2),
+                        totalWithoutVat: itemTotalWithoutVat.toFixed(2),
+                        totalWithVat: itemTotalWithVat.toFixed(2)
+                    };
+                } else {
+                    // Without VAT calculations
+                    const itemTotal = discountedPrice * qty;
+                    
+                    subtotal += price * qty;
+                    totalDiscount += (price - discountedPrice) * qty;
+                    grandTotal = subtotal - totalDiscount;
+                    
+                    return {
+                        ...item,
+                        priceWithoutVat: price.toFixed(2),
+                        discountedPrice: discountedPrice.toFixed(2),
+                        vatAmount: '0.00',
+                        totalWithoutVat: itemTotal.toFixed(2),
+                        totalWithVat: itemTotal.toFixed(2)
+                    };
+                }
+            });
+            
+            // Set styles
+            const primaryColor = '#c00';
+            const secondaryColor = '#333';
+            
+            // Header
+            doc.setFontSize(14);
+            doc.setTextColor(primaryColor);
+            doc.setFont('helvetica', 'bold');
+            doc.text(companyName, 297, 30, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setTextColor(secondaryColor);
+            doc.text(`${branch}`, 297, 40, { align: 'center' });
+            
+            doc.setFontSize(8);
+            doc.text(`DATE : ${formatDate(date)}`, 40, 30);
+
+            // Company details
+            doc.setFontSize(8);
+            const addressLines = address.split('\n');
+            addressLines.forEach((line, i) => {
+                doc.text(line, 40, 50 + (i * 12));
+            });
+            
+            const contactLines = contact.split('\n');
+            contactLines.forEach((line, i) => {
+                doc.text(line, 40, 80 + (i * 12));
+            });
+
+            // Client details
+            doc.setFontSize(10);
+            doc.text('TO', 350, 50);
+            
+            let clientY = 60;
+            doc.setFontSize(8);
+            if (clientId) {
+                doc.text(clientId, 350, clientY);
+                clientY += 12;
+            }
+            
+            doc.text(`: ${clientName}`, 350, clientY);
+            clientY += 12;
+            if (clientCompany) {
+                doc.text(`: ${clientCompany}`, 350, clientY);
+                clientY += 12;
+            }
+            doc.text(`: ${clientAddress}`, 350, clientY);
+            clientY += 12;
+            doc.text(`: ${clientCity}`, 350, clientY);
+            clientY += 12;
+            if (clientPhone) {
+                doc.text(`: ${clientPhone}`, 350, clientY);
+                clientY += 12;
+            }
+            if (clientVat) {
+                doc.text(`VAT NO: ${clientVat}`, 350, clientY);
+                clientY += 12;
+            }
+
+            // Invoice header
+            const startY = Math.max(100, clientY) + 15;
+            doc.setFillColor(primaryColor);
+            doc.setTextColor(255, 255, 255);
+            doc.rect(40, startY, 515, 10, 'F');
+            doc.setFontSize(8);
+            doc.text('PROFORMA INVOICE', 297, startY + 8, { align: 'center' });
+
+            // Items table
+            const headers = invoiceType === 'vat' 
+                ? ['Model', 'Description', 'Qty', 'Unit Price', 'Discounted Price', 'VAT', 'Total']
+                : ['Model', 'Description', 'Qty', 'Unit Price', 'Discounted Price', 'Total'];
+            
+            const data = processedItems.map(item => {
+                return invoiceType === 'vat'
+                    ? [
+                        item.model,
+                        item.description,
+                        item.qty,
+                        item.price,
+                        item.discountedPrice,
+                        item.vatAmount,
+                        item.totalWithVat
+                    ]
+                    : [
+                        item.model,
+                        item.description,
+                        item.qty,
+                        item.price,
+                        item.discountedPrice,
+                        item.totalWithVat
+                    ];
+            });
+            
+            // Add summary rows
+            if (invoiceType === 'vat') {
+                data.push(['', '', '', '', '', 'Subtotal:', subtotal.toFixed(2)]);
+                data.push(['', '', '', '', '', 'VAT (18%):', vatAmount.toFixed(2)]);
+                data.push(['', '', '', '', '','Grand Total:', grandTotal.toFixed(2)]);
+            } else {
+                data.push(['', '', '', '', 'Subtotal:', subtotal.toFixed(2)]);
+                data.push(['', '', '', '', 'Discount:', totalDiscount.toFixed(2)]);
+                data.push(['', '', '', '', 'Grand Total:', grandTotal.toFixed(2)]);
+
+            }
+            
+            // data.push([
+            //     '', '', '', '', 
+            //     invoiceType === 'vat' ? '' : '',
+            //     'Grand Total:', 
+            //     grandTotal.toFixed(2)
+            // ]);
+            
+            // Generate table
+            doc.autoTable({
+                startY: startY + 10,
+                head: [headers],
+                body: data,
+                headStyles: {
+                    fillColor: primaryColor,
+                    textColor: 255,
+                    fontStyle: 'bold',
+                    fontSize: 7
+                },
+                bodyStyles: {
+                    fontSize: 7,
+                    cellPadding: 2
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245]
+                },
+                columnStyles: {
+                    0: { cellWidth: 60 },
+                    1: { cellWidth: 215 },
+                    2: { cellWidth: 30 },
+                    3: { cellWidth: 50,halign: 'right' },
+                    4: { cellWidth: 60,halign: 'right' },
+                    5: { cellWidth: invoiceType === 'vat' ? 50 : 100,halign: 'right' },
+                    ...(invoiceType === 'vat' ? {6: { cellWidth: 50,halign: 'right' }} : {})
+                },
+                margin: { left: 40, right: 40 },
+                tableWidth: 'auto'
+            });
+            
+            // Terms and conditions
+            const finalY = doc.autoTable.previous.finalY + 20;
+            doc.setFontSize(10);
+            doc.setTextColor(secondaryColor);
+            doc.text('TERMS AND CONDITIONS', 40, finalY);
+            
+            doc.setFontSize(8);
+            doc.text(`Warranty    : ${warranty}`, 40, finalY + 15);
+            doc.text(`Delivery : ${delivery}`, 40, finalY + 25);
+            
+            doc.setFontSize(9);
+            doc.text(`It is with great pleasure we at ${companyName} submit a proposal for the supply of our products to your Organization.`, 
+                     40, finalY + 40, { maxWidth: 515 });
+            
+            if (warranty.includes('3') || warranty.includes('three') || warranty.includes('3 years')) {
+                doc.setFontSize(8);
+                doc.setTextColor(primaryColor);
+                doc.text('* EXTENDED WARRANTY : Extending warranty period by 2 years and You have total 3 years warranty', 
+                         40, finalY + 60);
+            }
+            
+            // Payment terms
+            doc.setFontSize(9);
+            doc.setTextColor(secondaryColor);
+            doc.text('Payment Terms:', 40, finalY + 80);
+            doc.text(paymentTerms, 40, finalY + 90, { maxWidth: 515 });
+            
+            // Signatory
+            doc.setFontSize(10);
+            doc.text(signatoryName, 40, finalY + 110);
+            doc.setFontSize(8);
+            doc.text(signatoryTitle, 40, finalY + 120);
+            
+            // Note
+            doc.setFontSize(9);
+            doc.text('NOTE :', 40, finalY + 140);
+            doc.text(note, 40, finalY + 150, { maxWidth: 515 });
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(primaryColor);
+            const footerText = `${companyName} | ${branch} | ${address.split('\n')[0]}`;
+            doc.text(footerText, 297, 820, { align: 'center' });
+            
+            // Save PDF
+            doc.save(`Proforma_Invoice_${invoiceNumber || formatDate(date)}.pdf`);
+        });
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        }
+        
+        // Initialize calculation preview
+        updateVatPreview();
+    </script>
+</body>
+</html>
