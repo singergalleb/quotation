@@ -338,6 +338,11 @@
             });
         });
         
+        // Function to format numbers with commas
+        function formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         // Update calculation preview
         function updateVatPreview() {
             const items = getItems();
@@ -379,16 +384,16 @@
             
             if (invoiceType === 'vat') {
                 vatPreview.innerHTML = `
-                    <p><strong>Subtotal (without VAT):</strong> ${subtotal.toFixed(2)}</p>
-                    <p><strong>Total Discount:</strong> ${totalDiscount.toFixed(2)}</p>
-                    <p><strong>VAT Amount (18%):</strong> ${vatAmount.toFixed(2)}</p>
-                    <p><strong>Grand Total:</strong> ${grandTotal.toFixed(2)}</p>
+                    <p><strong>Subtotal (without VAT):</strong> ${formatNumberWithCommas(subtotal.toFixed(0))}</p>
+                    <p><strong>Total Discount:</strong> ${formatNumberWithCommas(totalDiscount.toFixed(0))}</p>
+                    <p><strong>VAT Amount (18%):</strong> ${formatNumberWithCommas(vatAmount.toFixed(0))}</p>
+                    <p><strong>Grand Total:</strong> ${formatNumberWithCommas(grandTotal.toFixed(0))}</p>
                 `;
             } else {
                 vatPreview.innerHTML = `
-                    <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)}</p>
-                    <p><strong>Total Discount:</strong> ${totalDiscount.toFixed(2)}</p>
-                    <p><strong>Grand Total:</strong> ${grandTotal.toFixed(2)}</p>
+                    <p><strong>Subtotal:</strong> ${formatNumberWithCommas(subtotal.toFixed(0))}</p>
+                    <p><strong>Total Discount:</strong> ${formatNumberWithCommas(totalDiscount.toFixed(0))}</p>
+                    <p><strong>Grand Total:</strong> ${formatNumberWithCommas(grandTotal.toFixed(0))}</p>
                 `;
             }
         }
@@ -469,11 +474,11 @@
                     
                     return {
                         ...item,
-                        priceWithoutVat: priceWithoutVat.toFixed(2),
-                        discountedPrice: discountedPrice.toFixed(2),
-                        vatAmount: (itemVat * qty).toFixed(2),
-                        totalWithoutVat: itemTotalWithoutVat.toFixed(2),
-                        totalWithVat: itemTotalWithVat.toFixed(2)
+                        priceWithoutVat: formatNumberWithCommas(priceWithoutVat.toFixed(0)),
+                        discountedPrice: formatNumberWithCommas(discountedPrice.toFixed(0)),
+                        vatAmount: formatNumberWithCommas((itemVat * qty).toFixed(0)),
+                        totalWithoutVat: formatNumberWithCommas(itemTotalWithoutVat.toFixed(0)),
+                        totalWithVat: formatNumberWithCommas(itemTotalWithVat.toFixed(0))
                     };
                 } else {
                     // Without VAT calculations
@@ -485,11 +490,11 @@
                     
                     return {
                         ...item,
-                        priceWithoutVat: price.toFixed(2),
-                        discountedPrice: discountedPrice.toFixed(2),
-                        vatAmount: '0.00',
-                        totalWithoutVat: itemTotal.toFixed(2),
-                        totalWithVat: itemTotal.toFixed(2)
+                        priceWithoutVat: formatNumberWithCommas(price.toFixed(0)),
+                        discountedPrice: formatNumberWithCommas(discountedPrice.toFixed(0)),
+                        vatAmount: '0',
+                        totalWithoutVat: formatNumberWithCommas(itemTotal.toFixed(0)),
+                        totalWithVat: formatNumberWithCommas(itemTotal.toFixed(0))
                     };
                 }
             });
@@ -573,7 +578,7 @@
                         item.model,
                         item.description,
                         item.qty,
-                        item.price,
+                        formatNumberWithCommas(parseFloat(item.price).toFixed(0)), // Apply formatting here
                         item.discountedPrice,
                         item.vatAmount,
                         item.totalWithVat
@@ -582,7 +587,7 @@
                         item.model,
                         item.description,
                         item.qty,
-                        item.price,
+                        formatNumberWithCommas(parseFloat(item.price).toFixed(0)), // Apply formatting here
                         item.discountedPrice,
                         item.totalWithVat
                     ];
@@ -590,22 +595,15 @@
             
             // Add summary rows
             if (invoiceType === 'vat') {
-                data.push(['', '', '', '', '', 'Subtotal:', subtotal.toFixed(2)]);
-                data.push(['', '', '', '', '', 'VAT (18%):', vatAmount.toFixed(2)]);
-                data.push(['', '', '', '', '','Grand Total:', grandTotal.toFixed(2)]);
+                data.push(['', '', '', '', '', 'Subtotal:', formatNumberWithCommas(subtotal.toFixed(0))]);
+                data.push(['', '', '', '', '', 'VAT (18%):', formatNumberWithCommas(vatAmount.toFixed(0))]);
+                data.push(['', '', '', '', '','Grand Total:', formatNumberWithCommas(grandTotal.toFixed(0))]);
             } else {
-                data.push(['', '', '', '', 'Subtotal:', subtotal.toFixed(2)]);
-                data.push(['', '', '', '', 'Discount:', totalDiscount.toFixed(2)]);
-                data.push(['', '', '', '', 'Grand Total:', grandTotal.toFixed(2)]);
+                data.push(['', '', '', '', 'Subtotal:', formatNumberWithCommas(subtotal.toFixed(0))]);
+                data.push(['', '', '', '', 'Discount:', formatNumberWithCommas(totalDiscount.toFixed(0))]);
+                data.push(['', '', '', '', 'Grand Total:', formatNumberWithCommas(grandTotal.toFixed(0))]);
 
             }
-            
-            //data.push([
-               // '', '', '', '', 
-                // invoiceType === 'vat' ? '' : '',
-                // 'Grand Total:', 
-                // grandTotal.toFixed(2)
-            //]);
             
             // Generate table
             doc.autoTable({
@@ -622,7 +620,8 @@
                     
                 },
                 bodyStyles: {
-                    fontSize: 10,
+                    fontSize: 8.5,
+                    textColor: 0,
                     cellPadding: 2,
                     lineWidth: 0.1, // Border width
                     lineColor: 0    // Black border
@@ -631,8 +630,8 @@
                     fillColor: [255, 255, 255]
                 },
                 columnStyles: {
-                    0: { cellWidth: 70 },
-                    1: { cellWidth: 205 },
+                    0: { cellWidth: 80 },
+                    1: { cellWidth: 195 },
                     2: { cellWidth: 30 },
                     3: { cellWidth: 50, halign: 'right' },
                     4: { cellWidth: 60, halign: 'right' },
